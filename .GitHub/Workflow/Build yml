@@ -1,0 +1,38 @@
+
+name: Build Obsidian Client
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Set up CI workspace
+        run: ./gradlew setupCiWorkspace
+
+      - name: Build Obsidian Client
+        run: ./gradlew reobfJar
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Obsidian-Client
+          path: build/libs/*.jar
